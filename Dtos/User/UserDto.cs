@@ -24,6 +24,6 @@ namespace Challenge.Dtos.User
         [Range(0,128)]
         public int Age { get; set; }
         public string? Website { get; set; }
-        public ICollection<Note> Notes { get; set; }
+        public ICollection<Models.Note> Notes { get; set; }
     }
 }

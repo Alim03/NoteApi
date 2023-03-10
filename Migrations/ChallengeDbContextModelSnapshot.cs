@@ -53,7 +53,7 @@ namespace Challenge.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notes");
+                    b.ToTable("Notes", (string)null);
                 });
 
             modelBuilder.Entity("Challenge.Models.User", b =>
@@ -86,7 +86,7 @@ namespace Challenge.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Challenge.Models.Note", b =>

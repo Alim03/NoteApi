@@ -1,16 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Challenge.Models
+namespace Challenge.Dtos.Note
 {
-    public class Note
+    public class NoteDto : BaseDto
     {
-        [Key]
-        public int Id { get; set; }
         [Required]
         public string Content { get; set; }
         [Required]
@@ -18,11 +15,8 @@ namespace Challenge.Models
         [Required]
         public DateTime DateModified { get; set; }
         [Required]
-        [DefaultValue(0)]
         public int Views { get; set; }
         [Required]
         public bool Published { get; set; }
-        public int UserId { get; set; }
-        public User User { get; set; }
     }
 }

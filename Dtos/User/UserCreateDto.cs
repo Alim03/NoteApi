@@ -20,7 +20,7 @@ namespace Challenge.Dtos.User
         public string Email { get; set; }
 
         [Required]
-        [Range(0,128)]
+        [Range(0, 128)]
         public int Age { get; set; }
         public string? Website { get; set; }
     }

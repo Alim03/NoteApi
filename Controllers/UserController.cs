@@ -46,7 +46,7 @@ namespace Challenge.Controllers
         {
             try
             {
-                var user = await _userRepository.GetEagerLoadAsync(id);
+                var user =  _userRepository.GetEagerLoadAsync(id);
                 if (user == null)
                 {
                     return NotFound();
@@ -138,8 +138,5 @@ namespace Challenge.Controllers
             // await _userRepository.SaveAsync();
             // return Ok();
         }
-        // public async Task<JsonResult> Get() {
-        //     var d=_userRepository.GetAllAsync();
-        // }
     }
 }
