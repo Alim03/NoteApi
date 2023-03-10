@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Challenge.Models.Attributes;
 
 namespace Challenge.Dtos.User
 {
@@ -16,6 +17,7 @@ namespace Challenge.Dtos.User
         public string? LastName { get; set; }
 
         [EmailAddress]
+        [UniqueEmail]
         [Required]
         public string Email { get; set; }
 
