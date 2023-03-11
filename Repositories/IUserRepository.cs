@@ -8,6 +8,6 @@ namespace Challenge.Repositories
 {
     public interface IUserRepository : IRepository<User>
     {
-        User? GetEagerLoadAsync(int id);
+        Task<User?> GetEagerLoadAsync(int id);
     }
 }

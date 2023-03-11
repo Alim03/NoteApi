@@ -42,11 +42,11 @@ namespace Challenge.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get( int id)
+        public async Task<IActionResult> Get(int id)
         {
             try
             {
-                var user =  _userRepository.GetEagerLoadAsync(id);
+                var user = await _userRepository.GetEagerLoadAsync(id);
                 if (user == null)
                 {
                     return NotFound();

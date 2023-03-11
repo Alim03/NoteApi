@@ -11,10 +11,9 @@ namespace Challenge.Repositories
     public class UserRepository : Repository<User>, IUserRepository
     {
         public UserRepository(ChallengeDbContext context) : base(context) { }
-        public User? GetEagerLoadAsync(int id)
+        public async Task<User?> GetEagerLoadAsync(int id)
         {
-            var user =  context.Users.Where(x => x.Id == id).Include(x => x.Notes).ToList().FirstOrDefault();
-            return user;
+            return await context.Users.Include(x => x.Notes).Where(x => x.Id == id).FirstOrDefaultAsync();
         }
     }
 }

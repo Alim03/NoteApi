@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Challenge.Dtos.Note;
 using Challenge.Models;
 
 namespace Challenge.Dtos.User
@@ -24,6 +25,6 @@ namespace Challenge.Dtos.User
         [Range(0,128)]
         public int Age { get; set; }
         public string? Website { get; set; }
-        public ICollection<Models.Note> Notes { get; set; }
+        public ICollection<NoteDto> Notes { get; set; }
     }
 }
