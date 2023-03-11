@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Challenge.Dtos.User;
+using Challenge.Hubs;
 using Challenge.Models;
 using Challenge.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Challenge.Controllers
@@ -18,12 +20,16 @@ namespace Challenge.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<UserController> _logger;
+        private readonly IHubContext<CallCenterHub, ICallCenterHub> _hubContext;
 
-        public UserController(IUserRepository userRepository, IMapper mapper, ILogger<UserController> logger)
+        public UserController(IUserRepository userRepository, IMapper mapper,
+                            ILogger<UserController> logger, IHubContext<CallCenterHub,
+                            ICallCenterHub> hubContext)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _logger = logger;
+            _hubContext = hubContext;
         }
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -70,6 +76,7 @@ namespace Challenge.Controllers
                 var user = _mapper.Map<User>(userDto);
                 await _userRepository.AddAsync(user);
                 await _userRepository.SaveAsync();
+                await _hubContext.Clients.All.UserChangeReceived(user);
                 return CreatedAtAction(nameof(Get), new { id = user.Id }, user);
             }
             catch (Exception ex)
@@ -92,6 +99,7 @@ namespace Challenge.Controllers
             try
             {
                 await _userRepository.SaveAsync();
+                await _hubContext.Clients.All.UserChangeReceived(user);
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -122,6 +130,7 @@ namespace Challenge.Controllers
                 }
                 _userRepository.Remove(user);
                 await _userRepository.SaveAsync();
+                await _hubContext.Clients.All.UserChangeReceived(user);
                 return NoContent();
             }
             catch (Exception ex)

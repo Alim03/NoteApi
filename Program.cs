@@ -1,4 +1,5 @@
 using Challenge.Data.Context;
+using Challenge.Hubs;
 using Challenge.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ChallengeDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
-
+builder.Services.AddSignalR(conf => conf.EnableDetailedErrors = true);
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
@@ -35,7 +36,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseEndpoints(endpoints =>
 
+    endpoints.MapHub<CallCenterHub>("/callcenter")
+);
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthorization();
