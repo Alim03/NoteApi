@@ -8,11 +8,11 @@ namespace Challenge.Dtos.Note
 {
     public class NoteCreateDto
     {
-	[Required]
+        [Required]
         public string Content { get; set; }
         [Required]
         public bool Published { get; set; }
-	[Required]
+        [Required]
         public int UserId { get; set; }
     }
 }

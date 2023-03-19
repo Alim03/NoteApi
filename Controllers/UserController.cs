@@ -106,15 +106,6 @@ namespace Challenge.Controllers
                 return StatusCode(500);
             }
             return NoContent();
-            // var user = await _userRepository.GetAsync(userDto.Id);
-            // if (user == null)
-            // {
-            //     return NotFound();
-            // }
-
-            // _userRepository.Update(user);
-            // await _userRepository.SaveAsync();
-            // return Ok();
         }
 
         [HttpDelete("{id}")]
@@ -137,14 +128,6 @@ namespace Challenge.Controllers
                 _logger.LogError(ex.Message, $"Error Performing DELETE in {nameof(Delete)}");
                 return StatusCode(500);
             }
-            // var user = await _userRepository.GetAsync(id);
-            // if (user == null)
-            // {
-            //     return NotFound();
-            // }
-            // _userRepository.Remove(user);
-            // await _userRepository.SaveAsync();
-            // return Ok();
         }
     }
 }
