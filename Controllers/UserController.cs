@@ -20,11 +20,10 @@ namespace Challenge.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<UserController> _logger;
-        private readonly IHubContext<CallCenterHub, ICallCenterHub> _hubContext;
+        private readonly IHubContext<CallCenterHub,ICallCenterHub> _hubContext;
 
         public UserController(IUserRepository userRepository, IMapper mapper,
-                            ILogger<UserController> logger, IHubContext<CallCenterHub,
-                            ICallCenterHub> hubContext)
+                            ILogger<UserController> logger, IHubContext<CallCenterHub,ICallCenterHub> hubContext)
         {
             _userRepository = userRepository;
             _mapper = mapper;
@@ -76,7 +75,7 @@ namespace Challenge.Controllers
                 var user = _mapper.Map<User>(userDto);
                 await _userRepository.AddAsync(user);
                 await _userRepository.SaveAsync();
-                await _hubContext.Clients.All.UserChangeReceived(user);
+                await _hubContext.Clients.All.UserCreate(user);
                 return CreatedAtAction(nameof(Get), new { id = user.Id }, user);
             }
             catch (Exception ex)
@@ -99,7 +98,7 @@ namespace Challenge.Controllers
             try
             {
                 await _userRepository.SaveAsync();
-                await _hubContext.Clients.All.UserChangeReceived(user);
+                await _hubContext.Clients.All.UserUpdate(user);
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -130,7 +129,7 @@ namespace Challenge.Controllers
                 }
                 _userRepository.Remove(user);
                 await _userRepository.SaveAsync();
-                await _hubContext.Clients.All.UserChangeReceived(user);
+                await _hubContext.Clients.All.UserDelete(id);
                 return NoContent();
             }
             catch (Exception ex)

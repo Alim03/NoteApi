@@ -6,10 +6,10 @@ using Challenge.Models;
 
 namespace Challenge.Hubs
 {
-    public interface ICallCenterHub
+    public interface INoteCallCenterHub
     {
-        Task UserCreate(User user);
-        Task UserUpdate(User user);
-        Task UserDelete(int id);
+        Task NoteCreate(Note note);
+        Task NoteUpdate(Note note);
+        Task NoteDelete(int id);
     }
 }

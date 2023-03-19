@@ -26,7 +26,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(
     options =>
-        options.AddPolicy("AllowAll", b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin())
+        options.AddPolicy("AllowAll", b => b.WithOrigins("https://localhost:7113", "http://localhost:5185")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials())
 );
 var app = builder.Build();
 
@@ -36,14 +39,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseEndpoints(endpoints =>
 
-    endpoints.MapHub<CallCenterHub>("/callcenter")
-);
 app.UseHttpsRedirection();
+app.UseRouting();
 app.UseCors("AllowAll");
 app.UseAuthorization();
-
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<CallCenterHub>("/callcenter");
+    endpoints.MapHub<NoteCallHubCenter>("/notecallcenter");
+    endpoints.MapHub<AdminCallCenterHub>("admincallcenter");
+}
+);
 app.MapControllers();
 
 app.Run();

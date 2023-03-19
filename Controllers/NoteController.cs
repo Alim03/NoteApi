@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Challenge.Dtos.Note;
+using Challenge.Hubs;
 using Challenge.Models;
 using Challenge.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Challenge.Controllers
@@ -18,11 +20,15 @@ namespace Challenge.Controllers
         private readonly INoteRepository _noteRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<NoteController> _logger;
-        public NoteController(INoteRepository noteRepository, IMapper mapper, ILogger<NoteController> logger)
+        private readonly IHubContext<NoteCallHubCenter, INoteCallCenterHub> _hubContext;
+
+        public NoteController(INoteRepository noteRepository, IMapper mapper,
+        ILogger<NoteController> logger, IHubContext<NoteCallHubCenter, INoteCallCenterHub> hubContext)
         {
             _noteRepository = noteRepository;
             _mapper = mapper;
             _logger = logger;
+            _hubContext = hubContext;
         }
         [HttpGet]
         public async Task<IActionResult> GetAll(int userId)
@@ -67,6 +73,7 @@ namespace Challenge.Controllers
                 var note = _mapper.Map<Note>(noteDto);
                 await _noteRepository.AddAsync(note);
                 await _noteRepository.SaveAsync();
+                await _hubContext.Clients.All.NoteCreate(note);
                 return CreatedAtAction(nameof(Get), new { id = note.Id }, note);
             }
             catch (Exception ex)
@@ -88,6 +95,7 @@ namespace Challenge.Controllers
             try
             {
                 await _noteRepository.SaveAsync();
+                await _hubContext.Clients.All.NoteUpdate(note);
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -109,6 +117,7 @@ namespace Challenge.Controllers
                 }
                 _noteRepository.Remove(note);
                 await _noteRepository.SaveAsync();
+                await _hubContext.Clients.All.NoteDelete(id);
                 return NoContent();
             }
             catch (Exception ex)
