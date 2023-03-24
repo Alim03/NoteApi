@@ -14,13 +14,15 @@ namespace Challenge.Configuration
         public MapperConfig()
         {
             CreateMap<User, UserDto>().ReverseMap();
-            CreateMap<User, UserListDto>().ReverseMap();
+            CreateMap<User, UserDtoWithNotes>().ReverseMap();
             CreateMap<User, UserCreateDto>().ReverseMap();
             CreateMap<User, UserUpdateDto>().ReverseMap();
 
             CreateMap<Note, NoteDto>().ReverseMap();
             CreateMap<Note, NoteCreateDto>().ReverseMap();
             CreateMap<Note, NoteUpdateDto>().ReverseMap();
+
+            CreateMap<Note,NoteChangeDto>();
         }
     }
 }

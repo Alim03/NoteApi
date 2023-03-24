@@ -22,14 +22,19 @@ namespace Challenge.Controllers
         private readonly ILogger<NoteController> _logger;
         private readonly IHubContext<NoteCallHubCenter, INoteCallCenterHub> _hubContext;
 
-        public NoteController(INoteRepository noteRepository, IMapper mapper,
-        ILogger<NoteController> logger, IHubContext<NoteCallHubCenter, INoteCallCenterHub> hubContext)
+        public NoteController(
+            INoteRepository noteRepository,
+            IMapper mapper,
+            ILogger<NoteController> logger,
+            IHubContext<NoteCallHubCenter, INoteCallCenterHub> hubContext
+        )
         {
             _noteRepository = noteRepository;
             _mapper = mapper;
             _logger = logger;
             _hubContext = hubContext;
         }
+
         [HttpGet]
         public async Task<IActionResult> GetAll(int userId)
         {
@@ -59,6 +64,8 @@ namespace Challenge.Controllers
                 note.Views++;
                 _noteRepository.Update(note);
                 await _noteRepository.SaveAsync();
+                await _hubContext.Clients.All.NoteViewsChange(note.Views);
+
                 var noteDto = _mapper.Map<NoteDto>(note);
                 return Ok(noteDto);
             }
@@ -68,23 +75,30 @@ namespace Challenge.Controllers
                 return StatusCode(500);
             }
         }
+
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] NoteCreateDto noteDto)
+        public async Task<IActionResult> Create([FromBody] NoteCreateDto noteCreateDto)
         {
             try
             {
-                var note = _mapper.Map<Note>(noteDto);
+                var note = _mapper.Map<Note>(noteCreateDto);
                 await _noteRepository.AddAsync(note);
                 await _noteRepository.SaveAsync();
-                await _hubContext.Clients.All.NoteCreate(note);
+                var noteDto = _mapper.Map<NoteDto>(note);
+                await _hubContext.Clients.All.NoteCreate(noteDto);
                 return CreatedAtAction(nameof(Get), new { id = note.Id }, note);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, $"Error Performing POST in {nameof(Create)}", noteDto);
+                _logger.LogError(
+                    ex.Message,
+                    $"Error Performing POST in {nameof(Create)}",
+                    noteCreateDto
+                );
                 return StatusCode(500);
             }
         }
+
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] NoteUpdateDto noteDto)
         {
@@ -98,7 +112,8 @@ namespace Challenge.Controllers
             try
             {
                 await _noteRepository.SaveAsync();
-                await _hubContext.Clients.All.NoteUpdate(note);
+                var noteChangeDto = _mapper.Map<NoteChangeDto>(note);
+                await _hubContext.Clients.All.NoteUpdate(noteChangeDto);
             }
             catch (DbUpdateConcurrencyException ex)
             {

@@ -20,23 +20,28 @@ namespace Challenge.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<UserController> _logger;
-        private readonly IHubContext<CallCenterHub,ICallCenterHub> _hubContext;
+        private readonly IHubContext<CallCenterHub, ICallCenterHub> _hubContext;
 
-        public UserController(IUserRepository userRepository, IMapper mapper,
-                            ILogger<UserController> logger, IHubContext<CallCenterHub,ICallCenterHub> hubContext)
+        public UserController(
+            IUserRepository userRepository,
+            IMapper mapper,
+            ILogger<UserController> logger,
+            IHubContext<CallCenterHub, ICallCenterHub> hubContext
+        )
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _logger = logger;
             _hubContext = hubContext;
         }
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             try
             {
                 var users = await _userRepository.GetAllAsync();
-                var userDto = _mapper.Map<IEnumerable<UserListDto>>(users);
+                var userDto = _mapper.Map<IEnumerable<UserDto>>(users);
                 return Ok(userDto);
             }
             catch (Exception ex)
@@ -57,7 +62,7 @@ namespace Challenge.Controllers
                     return NotFound();
                 }
 
-                var userDto = _mapper.Map<UserDto>(user);
+                var userDto = _mapper.Map<UserDtoWithNotes>(user);
                 return Ok(userDto);
             }
             catch (Exception ex)
@@ -68,37 +73,43 @@ namespace Challenge.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] UserCreateDto userDto)
+        public async Task<IActionResult> Create([FromBody] UserCreateDto userCreateDto)
         {
             try
             {
-                var user = _mapper.Map<User>(userDto);
+                var user = _mapper.Map<User>(userCreateDto);
                 await _userRepository.AddAsync(user);
                 await _userRepository.SaveAsync();
-                await _hubContext.Clients.All.UserCreate(user);
+                var userDto = _mapper.Map<UserDto>(user);
+                await _hubContext.Clients.All.UserCreate(userDto);
                 return CreatedAtAction(nameof(Get), new { id = user.Id }, user);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message, $"Error Performing POST in {nameof(Create)}", userDto);
+                _logger.LogError(
+                    ex.Message,
+                    $"Error Performing POST in {nameof(Create)}",
+                    userCreateDto
+                );
                 return StatusCode(500);
             }
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UserUpdateDto userDto)
+        public async Task<IActionResult> Update([FromBody] UserUpdateDto userUpdateDto)
         {
-            var user = await _userRepository.GetAsync(userDto.Id);
+            var user = await _userRepository.GetAsync(userUpdateDto.Id);
             if (user == null)
             {
                 return NotFound();
             }
-            _mapper.Map(userDto, user);
+            _mapper.Map(userUpdateDto, user);
             _userRepository.Update(user);
             try
             {
                 await _userRepository.SaveAsync();
-                await _hubContext.Clients.All.UserUpdate(user);
+                var userDto = _mapper.Map<UserDto>(user);
+                await _hubContext.Clients.All.UserUpdate(userDto);
             }
             catch (DbUpdateConcurrencyException ex)
             {
