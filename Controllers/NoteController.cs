@@ -56,6 +56,9 @@ namespace Challenge.Controllers
                 {
                     return NotFound();
                 }
+                note.Views++;
+                _noteRepository.Update(note);
+                await _noteRepository.SaveAsync();
                 var noteDto = _mapper.Map<NoteDto>(note);
                 return Ok(noteDto);
             }
