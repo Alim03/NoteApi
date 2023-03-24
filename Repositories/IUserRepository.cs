@@ -9,5 +9,6 @@ namespace Challenge.Repositories
     public interface IUserRepository : IRepository<User>
     {
         Task<User?> GetEagerLoadAsync(int id);
+        bool IsEmailExist(string email);
     }
 }

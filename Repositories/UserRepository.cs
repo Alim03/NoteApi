@@ -15,5 +15,9 @@ namespace Challenge.Repositories
         {
             return await context.Users.Include(x => x.Notes).Where(x => x.Id == id).FirstOrDefaultAsync();
         }
+          public bool IsEmailExist(string email)
+        {
+            return context.Users.Any(user => user.Email == email);
+        }
     }
 }

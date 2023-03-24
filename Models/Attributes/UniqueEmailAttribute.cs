@@ -16,7 +16,7 @@ namespace Challenge.Models.Attributes
                 return ValidationResult.Success;
             }
 
-            var repository = validationContext.GetService(typeof(INoteRepository)) as INoteRepository;
+            var repository = validationContext.GetService(typeof(IUserRepository)) as IUserRepository;
 
             if (repository.IsEmailExist(value.ToString()))
             {

@@ -9,6 +9,5 @@ namespace Challenge.Repositories
     public interface INoteRepository : IRepository<Note>
     {
         Task<IEnumerable<Note>?> GetUserNotes(int userId);
-        bool IsEmailExist(string email);
     }
 }
