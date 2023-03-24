@@ -14,7 +14,7 @@ namespace Challenge.Controllers
     [Route("api/[controller]")]
     public class AdminMessageController : ControllerBase
     {
-        private readonly static Queue<dynamic> queue = new Queue<dynamic>();
+        private readonly static Queue<JObject> queue = new Queue<JObject>();
         private readonly IHubContext<AdminCallCenterHub, IAdminCallCenterHub> _hubContext;
         public AdminMessageController(IHubContext<AdminCallCenterHub, IAdminCallCenterHub> hubContext)
         {
@@ -28,7 +28,7 @@ namespace Challenge.Controllers
                 await _hubContext.Clients.All.MessageAdded(data["message"].ToString());
             }
             queue.Enqueue(data);
-            if (queue.Count >= 3)
+            if (queue.Count >= 10)
             {
                 var list = queue.ToList();
                 queue.Clear();
