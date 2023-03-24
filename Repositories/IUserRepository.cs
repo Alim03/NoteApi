@@ -10,5 +10,6 @@ namespace Challenge.Repositories
     {
         Task<User?> GetEagerLoadAsync(int id);
         bool IsEmailExist(string email);
+        Task<User?> GetByEmail(string email);
     }
 }
