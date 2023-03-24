@@ -40,12 +40,16 @@ namespace Challenge.Controllers
         {
             try
             {
+                // Get all users from the repository asynchronously.
                 var users = await _userRepository.GetAllAsync();
+                // Map the users to user DTOs using AutoMapper.
                 var userDto = _mapper.Map<IEnumerable<UserDto>>(users);
+                // Return the list of user DTOs as an OK response.
                 return Ok(userDto);
             }
             catch (Exception ex)
             {
+                // If an exception is caught, log the error message and return a 500 internal server error response.
                 _logger.LogError(ex.Message, $"Error Performing GET in {nameof(GetAll)}");
                 return StatusCode(500);
             }
@@ -56,17 +60,21 @@ namespace Challenge.Controllers
         {
             try
             {
+                // Get the user with the given ID and eager load their notes.
                 var user = await _userRepository.GetEagerLoadAsync(id);
+                // If the user is not found, return a 404 status code.
                 if (user == null)
                 {
                     return NotFound();
                 }
-
+                // Map the user to UserDtoWithNotes.
                 var userDto = _mapper.Map<UserDtoWithNotes>(user);
+                // Return the UserDtoWithNotes object with a 200 status code.
                 return Ok(userDto);
             }
             catch (Exception ex)
             {
+                // Log the error message and return a 500 status code.
                 _logger.LogError(ex.Message, $"Error Performing GET in {nameof(Get)}");
                 return StatusCode(500);
             }
@@ -77,11 +85,17 @@ namespace Challenge.Controllers
         {
             try
             {
+                // Map the UserCreateDto to a User entity
                 var user = _mapper.Map<User>(userCreateDto);
+                // Add the User to the database
                 await _userRepository.AddAsync(user);
                 await _userRepository.SaveAsync();
+
+                // Map the User to a UserDto
                 var userDto = _mapper.Map<UserDto>(user);
+                // Notify all connected clients that a user was created
                 await _hubContext.Clients.All.UserCreate(userDto);
+                // Return a response indicating that the user was successfully created
                 return CreatedAtAction(nameof(Get), new { id = user.Id }, user);
             }
             catch (Exception ex)
@@ -98,17 +112,22 @@ namespace Challenge.Controllers
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UserUpdateDto userUpdateDto)
         {
+            // Get the User entity with the specified ID
             var user = await _userRepository.GetAsync(userUpdateDto.Id);
+            // If the User entity is not found, return a 404 status code
             if (user == null)
             {
                 return NotFound();
             }
+            // Map the UserUpdateDto to the existing User entity
             _mapper.Map(userUpdateDto, user);
+            // Update the User entity in the database
             _userRepository.Update(user);
             try
             {
                 await _userRepository.SaveAsync();
                 var userDto = _mapper.Map<UserDto>(user);
+                // Notify all connected clients that a user was updated
                 await _hubContext.Clients.All.UserUpdate(userDto);
             }
             catch (DbUpdateConcurrencyException ex)
@@ -116,6 +135,7 @@ namespace Challenge.Controllers
                 _logger.LogError(ex.Message, $"Error Performing GET in {nameof(Update)}");
                 return StatusCode(500);
             }
+            // Return a response indicating that the user was successfully updated
             return NoContent();
         }
 
@@ -124,13 +144,16 @@ namespace Challenge.Controllers
         {
             try
             {
+                // Get the User entity with the specified ID
                 var user = await _userRepository.GetAsync(id);
                 if (user == null)
                 {
                     return NotFound();
                 }
+                // Remove the User entity from the database
                 _userRepository.Remove(user);
                 await _userRepository.SaveAsync();
+                // Notify all connected clients that a user was deleted
                 await _hubContext.Clients.All.UserDelete(id);
                 return NoContent();
             }
