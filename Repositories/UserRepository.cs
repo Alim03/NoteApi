@@ -25,9 +25,9 @@ namespace Challenge.Repositories
             return context.Users.Any(user => user.Email == email);
         }
 
-        public async Task<User?> GetByEmail(string email)
+        public User? GetByEmail(string email)
         {
-            return await context.Users.FirstOrDefaultAsync(x => x.Email == email);
+            return  context.Users.SingleOrDefault(x => x.Email == email);
         }
     }
 }

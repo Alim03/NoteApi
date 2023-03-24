@@ -17,7 +17,7 @@ namespace Challenge.Dtos.User
         public string? LastName { get; set; }
 
         [EmailAddress]
-        [UniqueEmail]
+        [UniqueEmailOnUpdate]
         [Required]
         public string Email { get; set; }
 
